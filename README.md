@@ -1,6 +1,6 @@
 NetAlgo - Expert Advisors (EA) - MQL5
 
-The MQL5-Experts folder is a dedicated directory within the MetaTrader 5 (MT5) platform that houses Expert Advisors (EAs). This folder is essential for users who wish to implement automated trading strategies using MQL5 scripts, allowing traders to enhance their trading activities by leveraging algorithmic trading.
+The ["MQL5/1. Experts"] folder is a dedicated directory within the MetaTrader 5 (MT5) platform that houses Expert Advisors (EAs). This folder is essential for users who wish to implement automated trading strategies using MQL5 scripts, allowing traders to enhance their trading activities by leveraging algorithmic trading.
 
 Contents:
 
