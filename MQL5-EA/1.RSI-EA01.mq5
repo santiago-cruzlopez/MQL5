@@ -42,7 +42,7 @@ void OnTick()
         int posType = (int)PositionGetInteger(POSITION_TYPE);
         if(posType == POSITION_TYPE_BUY){        
            trade.PositionClose(posTicket);
-           posType = 0;
+           posTicket = 0;
         }
      }
     
@@ -56,7 +56,7 @@ void OnTick()
         int posType = (int)PositionGetInteger(POSITION_TYPE);
         if(posType == POSITION_TYPE_SELL){        
            trade.PositionClose(posTicket);
-           posType = 0;
+           posTicket = 0;
         }
      }
    
