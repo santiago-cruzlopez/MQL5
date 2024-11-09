@@ -1,7 +1,7 @@
 //+------------------------------------------------------------------+
 //|                                                    RSI_EA_03.mq5 |
-//|                                  Copyright 2024, MetaQuotes Ltd. |
-//|                                             https://www.mql5.com |
+//|                               Author: Santiago Cruz, AlgoNet Inc.|
+//|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
 #property copyright "Copyright 2024, MetaQuotes Ltd."
 #property link      "https://www.mql5.com"
