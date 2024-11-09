@@ -3,8 +3,8 @@
 //|                               Author: Santiago Cruz, AlgoNet Inc.|
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2024, MetaQuotes Ltd."
-#property link      "https://www.mql5.com"
+#property copyright "Santiago Cruz, AlgoNet Inc."
+#property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 
 // Input parameters
