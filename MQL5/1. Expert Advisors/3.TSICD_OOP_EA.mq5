@@ -116,9 +116,6 @@ void OnTick()
 
 //---Defining MQL structures to be used for trading
    MqlTick latest_price;                  //To be used to get the latest information about prices
-   MqlTradeRequest mrequest;              //To be used to send trade requests
-   MqlTradeResult mresult;                //To be used to access trade results
-   ZeroMemory(mrequest);
 
 //---Checking if we have the latest price quote
    if(!SymbolInfoTick(_Symbol,latest_price))
