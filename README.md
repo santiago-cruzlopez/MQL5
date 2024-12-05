@@ -4,7 +4,7 @@ The ["MQL5"] folder is a dedicated directory within the MetaTrader 5 (MT5) platf
 
 Contents:
 
-1. Expert Advisor Files: This folder contains .mq5 and .ex5 files for various EAs developed in the MQL5 programming language. Each file represents a unique automated trading strategy that can be deployed on the MT5 platform.
+1. Expert Advisor Files: This folder contains .mq5 files for various EAs developed in the MQL5 programming language. Each file represents a unique automated trading strategy that can be deployed on the MT5 platform.
 
 
 Key Features:
