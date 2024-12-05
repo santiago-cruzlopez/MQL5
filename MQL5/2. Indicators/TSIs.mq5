@@ -1,10 +1,10 @@
 //+------------------------------------------------------------------+
 //|                                             Second Indicator.mq5 |
-//|                                                       Joy D Moyo |
-//|                                               joydmoyo@gmail.com |
+//|                                      Santiago Cruz, AlgoNet Inc. |
+//|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
-#property copyright "Joy D Moyo"
-#property link      "joydmoyo@gmail.com"
+#property copyright "Santiago Cruz, AlgoNet Inc."
+#property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 #property indicator_separate_window
 #property indicator_buffers 8
