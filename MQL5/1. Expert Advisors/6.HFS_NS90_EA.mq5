@@ -128,8 +128,33 @@ bool IsNewBar()
 //+------------------------------------------------------------------+
 //|Sending Buy Orders                                                |
 //+------------------------------------------------------------------+
-void SendBuyOrder(){
+void SendBuyOrder(double entry){
+   double ask = SymbolInfoDouble(_Symbol,SYMBOL_ASK);
+   
+   if(ask > entry - OrderDistPoints * _Point)
+     {
+      return;
+     }
+   double tp = entry + TPpoints * _Point;
+   double sl = entry - SLPoints * _Point;
+}
 
+//+------------------------------------------------------------------+
+//|Calculation of Lot Size                                           |
+//+------------------------------------------------------------------+
+double calcLots(double slPoints){
+   double risk = AccountInfoDouble(ACCOUNT_BALANCE) * RiskPercent /100;
+   
+   double ticksize = SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_SIZE);
+   double tickvalue = SymbolInfoDouble(_Symbol,SYMBOL_TRADE_TICK_VALUE);
+   double lotstep = SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_STEP);
+   double minvolume = SymbolInfoDouble(Symbol(),SYMBOL_VOLUME_MIN);
+   double maxvolume = SymbolInfoDouble(Symbol(),SYMBOL_VOLUME_MAX);
+   double volumelimit = SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_LIMIT);
+   
+   
+   
+   return lots;
 }
 
 //+------------------------------------------------------------------+
