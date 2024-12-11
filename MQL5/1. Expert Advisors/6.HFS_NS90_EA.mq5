@@ -53,6 +53,9 @@ int OrderDistPoints = 100;
 int OnInit()
   {
    trade.SetExpertMagicNumber(InpMagic);
+   
+   ChartSetInteger(0,CHART_SHOW_GRID,false);
+    
    return(INIT_SUCCEEDED);
   }
   
