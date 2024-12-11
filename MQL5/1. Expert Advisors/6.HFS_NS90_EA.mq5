@@ -7,6 +7,12 @@
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 
+#include <Trade/Trade.mqh>
+
+CTrade            trade;
+CPositionInfo     pos;
+COrderInfo        ord;
+
 input group "=== Trading Inputs ==="
 
 input string TradeComment     = "Scalping NS90 EA";
@@ -14,7 +20,7 @@ input string TradeComment     = "Scalping NS90 EA";
 input int    InpMagic         = 902563; //EA Magic Number
 input double RiskPercent      = 3;      //Risk as % of Trading Capital
 input int    TPpoints         = 200;    //Take Profit (10 Points = 1 Pip)
-input int    SLPoint          = 200;    //Stop Loss Points (10 Points = 1 Pip)
+input int    SLPoints         = 200;    //Stop Loss Points (10 Points = 1 Pip)
 input int    TslTriggerPoints = 15;     //Points in Profits before Trailing SL is activated (10 Points = 1 Pip)
 input int    TslPoints        = 10;     //Trailing Stop Loss (10 Points = 1 Pip)
 
@@ -46,11 +52,10 @@ int OrderDistPoints = 100;
 //+------------------------------------------------------------------+
 int OnInit()
   {
-//---
-
-//---
+   trade.SetExpertMagicNumber(InpMagic);
    return(INIT_SUCCEEDED);
   }
+  
 //+------------------------------------------------------------------+
 //| Expert deinitialization function                                 |
 //+------------------------------------------------------------------+
@@ -59,12 +64,68 @@ void OnDeinit(const int reason)
 //---
 
   }
+  
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick()
   {
 //---
+   if(!IsNewBar()) return;
+   
+   MqlDateTime time;
+   TimeToStruct(TimeCurrent(),time);
+   
+   int Hournow = time.hour;
+   
+   SHChoice = SHInput;
+   EHChoice = EHInput;
+   
+   if(Hournow<SHChoice)
+     {
+      CloseAllOrders();
+      return;
+     }
+   if(Hournow>=EHChoice && EHChoice!=0)
+     {
+      CloseAllOrders();
+      return;
+     }
+     
+   int BuyTotal = 0;
+   int SellTotal = 0;
+   
+   for(int i=PositionsTotal()-1; i>=0; i--)
+     {
+      pos.SelectByIndex(i);
+      if(pos.PositionType()==POSITION_TYPE_BUY && pos.Symbol()==_Symbol && pos.Magic()==InpMagic) BuyTotal++;
+      if(pos.PositionType()==POSITION_TYPE_SELL && pos.Symbol()==_Symbol && pos.Magic()==InpMagic) SellTotal++;
+     }
+   
+   for(int i=OrdersTotal()-1; i>=0; i--)
+     {
+      pos.SelectByIndex(i);
+      if(ord.OrderType()==ORDER_TYPE_BUY_STOP && ord.Symbol()==_Symbol && ord.Magic()==InpMagic) BuyTotal++;
+      if(ord.OrderType()==ORDER_TYPE_SELL_STOP && ord.Symbol()==_Symbol && ord.Magic()==InpMagic) SellTotal++;
+     }
+   
+   if(BuyTotal <=0)
+     {
+      double high = findHigh();
+      if(high > 0)
+        {
+         SendBuyOrder(high);
+        }
+     }
+     
+   if(SellTotal <=0)
+     {
+      double low = findLow();
+      if(low > 0)
+        {
+         SendSellOrder(low);
+        }
+     }
 
   }
 
@@ -129,14 +190,38 @@ bool IsNewBar()
 //|Sending Buy Orders                                                |
 //+------------------------------------------------------------------+
 void SendBuyOrder(double entry){
-   double ask = SymbolInfoDouble(_Symbol,SYMBOL_ASK);
+
+   double ask = SymbolInfoDouble(_Symbol,SYMBOL_ASK);  
+   if(ask > entry - OrderDistPoints * _Point) return;
    
-   if(ask > entry - OrderDistPoints * _Point)
-     {
-      return;
-     }
    double tp = entry + TPpoints * _Point;
    double sl = entry - SLPoints * _Point;
+   
+   double lots = 0.01;
+   if(RiskPercent > 0) lots = calcLots(entry-sl);
+   
+   datetime expiration = iTime(_Symbol,Timeframe,0) + ExpirationBars * PeriodSeconds(Timeframe);
+   
+   trade.BuyStop(lots,entry,_Symbol,sl,tp,ORDER_TIME_SPECIFIED,expiration);
+}
+
+//+------------------------------------------------------------------+
+//|Sending Sell Orders                                               |
+//+------------------------------------------------------------------+
+void SendSellOrder(double entry){
+
+   double bid = SymbolInfoDouble(_Symbol,SYMBOL_BID);   
+   if(bid < entry + OrderDistPoints * _Point) return;
+   
+   double tp = entry - TPpoints * _Point;
+   double sl = entry + SLPoints * _Point;
+   
+   double lots = 0.01;
+   if(RiskPercent > 0) lots = calcLots(sl-entry);
+   
+   datetime expiration = iTime(_Symbol,Timeframe,0) + ExpirationBars * PeriodSeconds(Timeframe);
+   
+   trade.SellStop(lots,entry,_Symbol,sl,tp,ORDER_TIME_SPECIFIED,expiration);
 }
 
 //+------------------------------------------------------------------+
@@ -152,9 +237,31 @@ double calcLots(double slPoints){
    double maxvolume = SymbolInfoDouble(Symbol(),SYMBOL_VOLUME_MAX);
    double volumelimit = SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_LIMIT);
    
+   double moneyPerLotstep = slPoints / ticksize * tickvalue * lotstep;
+   double lots = MathFloor(risk/moneyPerLotstep) * lotstep;
    
+   if(volumelimit!=0) lots = MathMin(lots,volumelimit);
+   if(maxvolume!=0) lots = MathMin(lots,SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MAX));
+   if(minvolume!=0) lots = MathMax(lots,SymbolInfoDouble(_Symbol,SYMBOL_VOLUME_MIN));
+   lots = NormalizeDouble(lots,2);
    
    return lots;
+}
+
+//+------------------------------------------------------------------+
+//|Closing All Orders                                                |
+//+------------------------------------------------------------------+
+void CloseAllOrders(){
+
+   for(int i=OrdersTotal()-1;i>=0;i--)
+     {
+      ord.SelectByIndex(i);
+      ulong ticket = ord.Ticket();
+      if(ord.Symbol()==_Symbol && ord.Magic()==InpMagic)
+        {
+         trade.OrderDelete(ticket);
+        }    
+     }
 }
 
 //+------------------------------------------------------------------+
