@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                                                     RSI-EA01.mq5 |
+//|                                                  HFS_NS90_EA.mq5 |
 //|                                      Santiago Cruz, AlgoNet Inc. |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
@@ -55,7 +55,7 @@ int OnInit()
    trade.SetExpertMagicNumber(InpMagic);
    
    ChartSetInteger(0,CHART_SHOW_GRID,false);
-    
+   
    return(INIT_SUCCEEDED);
   }
   
@@ -74,6 +74,8 @@ void OnDeinit(const int reason)
 void OnTick()
   {
 //---
+   TrailStop(); //We want to check TS before any bar
+
    if(!IsNewBar()) return;
    
    MqlDateTime time;
@@ -264,6 +266,54 @@ void CloseAllOrders(){
         {
          trade.OrderDelete(ticket);
         }    
+     }
+}
+
+//+------------------------------------------------------------------+
+//|Trailing StopLoss                                                 |
+//+------------------------------------------------------------------+
+void TrailStop(){
+
+   double sl = 0;
+   double tp = 0;   
+   double ask = SymbolInfoDouble(_Symbol,SYMBOL_ASK);
+   double bid = SymbolInfoDouble(_Symbol,SYMBOL_BID);
+   
+   for(int i=PositionsTotal()-1; i>=0; i--)
+     {
+      if(pos.SelectByIndex(i))
+        {
+         ulong ticket = pos.Ticket();
+         
+         if(pos.Magic()==InpMagic && pos.Symbol()==_Symbol)
+           {
+            if(pos.PositionType()==POSITION_TYPE_BUY)
+              {
+               if(bid-pos.PriceOpen()>TslTriggerPoints*_Point) //If the current price is bigger than 15, then we activated the TS
+                 {
+                  tp = pos.TakeProfit();
+                  sl = bid - (TslPoints * _Point);
+                  
+                  if(sl > pos.StopLoss() && sl!=0)
+                    {
+                     trade.PositionModify(ticket,sl,tp);
+                    }
+                 }
+              }
+            else if(pos.PositionType()==POSITION_TYPE_SELL)
+                   {
+                    if(ask+(TslTriggerPoints*_Point)<pos.PriceOpen())
+                      {
+                       tp = pos.TakeProfit();
+                       sl = ask + (TslPoints * _Point);
+                       if(sl < pos.StopLoss() && sl!=0)
+                         {
+                          trade.PositionModify(ticket,sl,tp);
+                         }
+                      }
+                   }
+           }
+        }
      }
 }
 
