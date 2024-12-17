@@ -45,7 +45,7 @@ int EHChoice;
 
 int BarsN = 5;
 int ExpirationBars = 100;
-int OrderDistPoints = 100;
+double OrderDistPoints = 100;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -83,8 +83,6 @@ void OnTick()
    
    int Hournow = time.hour;
    
-   SHChoice = SHInput;
-   EHChoice = EHInput;
    
    if(Hournow<SHChoice)
      {
@@ -96,6 +94,9 @@ void OnTick()
       CloseAllOrders();
       return;
      }
+     
+   SHChoice = SHInput;
+   EHChoice = EHInput;
      
    int BuyTotal = 0;
    int SellTotal = 0;
