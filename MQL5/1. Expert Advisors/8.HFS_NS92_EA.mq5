@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                                               13.HFS_NS92_EA.mq5 |
+//|                                                  HFS_NS92_EA.mq5 |
 //|                                      Santiago Cruz, AlgoNet Inc. |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
@@ -21,7 +21,7 @@ input group "=== Trading Profiles ==="
 input group "=== Trading Inputs ==="
 
    input string TradeComment     = "Scalping NS92 EA";
-   input int    InpMagic         = 912581; //EA Magic Number
+   input int    InpMagic         = 922581; //EA Magic Number
    input double RiskPercent      = 3;      //Risk as % of Trading Capital
    input ENUM_TIMEFRAMES Timeframe = PERIOD_CURRENT;
 
