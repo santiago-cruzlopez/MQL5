@@ -10,10 +10,9 @@ Contents:
 Key Features:
 
 - Fully Automated: Executes trades automatically based on market analysis.
-- Multiple Strategies: Includes trend following, mean reversion, and breakout approaches.
-- Risk Management: Configurable stop loss, take profit, and drawdown limits.
+- Multiple Strategies: Includes trend following, Scalping and Neural Networks.
+- Risk Management: Configurable stop loss, take profit, drawdown limits and Trailing Stops.
 - Customizable: Easily adjust parameters to suit individual trading styles.
 - Backtesting: Test strategies with historical data before live trading.
-- User-Friendly: Intuitive interface for both novice and experienced traders.
 - Real-Time Analysis: Utilizes technical indicators for timely decision-making.
-- Alerts: Provides notifications on trade execution and market events.
+- Alerts: Provides notifications on trade execution and market events using Discord Server.
