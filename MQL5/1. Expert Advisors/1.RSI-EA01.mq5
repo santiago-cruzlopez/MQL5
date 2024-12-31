@@ -1,10 +1,11 @@
 //+------------------------------------------------------------------+
 //|                                                     RSI-EA01.mq5 |
-//|                                      Santiago Cruz, AlgoNet Inc. |
-//|                       https://www.mql5.com/en/users/algo-trader/ |
+//|                                  Copyright 2024, MetaQuotes Ltd. |
+//|                                             https://www.mql5.com |
+//|                               Author: Santiago Cruz, AlgoNet Inc.|
 //+------------------------------------------------------------------+
-#property copyright "Santiago Cruz, AlgoNet Inc."
-#property link      "https://www.mql5.com/en/users/algo-trader/"
+#property copyright "Copyright 2024, MetaQuotes Ltd."
+#property link      "https://www.mql5.com"
 #property version   "1.00"
 
 #include <Trade/Trade.mqh>
@@ -36,7 +37,7 @@ void OnTick()
    double rsi[];
    CopyBuffer(rsiHandle,0,1,1,rsi);
    
-   if(rsi[0] > 70){  
+   if(rsi[0] > 30){  
      if(posTicket > 0 && PositionSelectByTicket(posTicket)){
         int posType = (int)PositionGetInteger(POSITION_TYPE);
         if(posType == POSITION_TYPE_BUY){        
@@ -50,7 +51,7 @@ void OnTick()
         posTicket = trade.ResultOrder();
      }
      
-   }else if(rsi[0] < 30){
+   }else if(rsi[0] < 70){
       if(posTicket > 0 && PositionSelectByTicket(posTicket)){
         int posType = (int)PositionGetInteger(POSITION_TYPE);
         if(posType == POSITION_TYPE_SELL){        
