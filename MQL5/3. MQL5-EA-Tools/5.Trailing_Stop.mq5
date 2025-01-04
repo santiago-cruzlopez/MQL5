@@ -3,6 +3,9 @@
 //|                                      Santiago Cruz, AlgoNet Inc. |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
+
+//Source: "https://github.com/nkanven/MT4-MT5-Trading-EA-Collections/blob/master/MQL5/Experts/Nkanven/TrendlinesEA.mq5"
+
 #property copyright "Santiago Cruz, AlgoNet Inc."
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
