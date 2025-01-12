@@ -4,6 +4,9 @@
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
 
+//---NOTE: Once we download the BackTest Results on MT5, we have to Calculate the Kelly Criterion using Python, find the files here:
+//--- Kelly Criterion Code: https://github.com/santiago-cruzlopez/Python-Codes/tree/main/Finance
+
 //---Portfolio Risk Model using Kelly Criterion and Monte Carlo Simulation
 //Source: https://www.mql5.com/en/articles/16500?utm_source=mql5.com.tg&utm_medium=message&utm_campaign=articles.codes.repost
 
