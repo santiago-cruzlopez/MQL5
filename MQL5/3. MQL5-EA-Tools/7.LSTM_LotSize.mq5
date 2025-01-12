@@ -20,7 +20,6 @@
    
    Given a backtest result, we can obtain the variable value by the following formulas.
 
-
    Let's say you're trading with 2:1 leverage. Assume the following:
 
    The probability of a successful trade (p) = 0.6 (60% chance of winning).
