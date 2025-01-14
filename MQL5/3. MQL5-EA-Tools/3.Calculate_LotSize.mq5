@@ -12,8 +12,6 @@
 
 input double RiskPercent = 2;    //Risk on one tradfe as % of Capital
 
-
-
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
