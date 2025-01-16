@@ -4,8 +4,6 @@
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
 
-//source: https://www.mql5.com/en/articles/16560
-
 #property copyright "Santiago Cruz, AlgoNet Inc."
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
