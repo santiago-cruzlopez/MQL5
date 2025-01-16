@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                                                     RSI-EA01.mq5 |
+//|                                                  1.RSI_V1_EA.mq5 |
 //|                                  Copyright 2024, MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //|                               Author: Santiago Cruz, AlgoNet Inc.|
