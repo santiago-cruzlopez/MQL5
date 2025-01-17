@@ -141,6 +141,7 @@ void OnTick()
         }
      }
 
+//Withoud OOP, use #include <Trade\Trade.mqh> to avoid the following part of the code.
 //---Set Instructions for Opening and Closing Trades
 //---Executing a Buy Trade
    if(Buycondition == true)
