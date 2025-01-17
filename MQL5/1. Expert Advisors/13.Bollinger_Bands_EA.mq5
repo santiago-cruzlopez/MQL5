@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                                         7.Bollinger_Bands_EA.mq5 |
+//|                                        13.Bollinger_Bands_EA.mq5 |
 //|                                      Santiago Cruz, AlgoNet Inc. |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
