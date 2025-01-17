@@ -138,8 +138,7 @@ void OnTick()
 //---Check For Close Position Buy/Sell with Base Band   
    if(!CountOpenPositions(cntBuy,cntSell)){return;}   
    if(cntBuy>0 && currentTick.bid>=BB_BaseBuffer[0]){ClosePositions(1);}
-   if(cntSell>0 && currentTick.ask<=BB_BaseBuffer[0]){ClosePositions(2);}
-   
+   if(cntSell>0 && currentTick.ask<=BB_BaseBuffer[0]){ClosePositions(2);}   
   }
 
 //+------------------------------------------------------------------+
