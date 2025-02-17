@@ -13,7 +13,7 @@ input group "=== Trading Inputs ==="
 
 input  string            TradeComment   = "Ichi_ATR_EA";
 static input long        EA_Magic       = 237925;       //Magic Number
-input  double            Lots           = 0.5;
+input  double            LotSize        = 0.5;
 
 input  int               ATR_Period     = 14;           //ATR Period for Dynamic SL and TP
 input  double            ATR_SLFactor   = 1.0;
@@ -36,8 +36,6 @@ double ATR_Buffer[];
 datetime timestamp;
 
 CTrade   trade;
-CSymbolInfo m_symbol;
-CPositionInfo PositionInfo;
 
 int OnInit()
   {
@@ -47,6 +45,7 @@ int OnInit()
       Alert("Failed to create ATR Indicator Handle: ", GetLastError());
       return INIT_FAILED;
      }
+
    Ichimoku_Handle = iIchimoku(Symbol(),Ichi_Period,Tenkan_Sen,Kijun_Sen,Senkou_SpanB);
    if(Ichimoku_Handle == INVALID_HANDLE)
      {
@@ -69,12 +68,8 @@ void OnDeinit(const int reason)
   }
 
 void OnTick()
-  {
-   
-   if(!IsNewBar())
-     {
-      return;
-     }
+  {  
+   if(!IsNewBar()){return;}
 
    double tenkanSen[], kijunSen[], SenkouSpanA[], SenkouSpanB[], ChikousSpan[];   
    CopyBuffer(Ichimoku_Handle,TENKANSEN_LINE,1,2,tenkanSen);
@@ -92,14 +87,14 @@ void OnTick()
      {
       double sl = ask - ATR_Buffer[0]*ATR_SLFactor;
       double tp = ask + ATR_Buffer[0]*ATR_TPFactor;
-      trade.Buy(Lots,_Symbol,ask,sl,tp,TradeComment);
+      trade.Buy(LotSize,_Symbol,ask,sl,tp,TradeComment);
      }
    else
      if(tenkanSen[1]<kijunSen[1] && tenkanSen[0]>=kijunSen[0])
        {
         double sl = bid + ATR_Buffer[0]*ATR_SLFactor;
         double tp = bid - ATR_Buffer[0]*ATR_TPFactor;
-        trade.Sell(Lots,_Symbol,ask,sl,tp,TradeComment);
+        trade.Sell(LotSize,_Symbol,ask,sl,tp,TradeComment);
        }
   }
 
