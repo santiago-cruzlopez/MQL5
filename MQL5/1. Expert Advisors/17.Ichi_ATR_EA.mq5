@@ -11,12 +11,13 @@
 
 input group "=== Trading Inputs ==="
 
-input  string            TradeComment   = "SDZ EA";
+input  string            TradeComment   = "Ichi_ATR_EA";
 static input long        EA_Magic       = 237925;       //Magic Number
-input  double            RiskPercent    = 0.5;
+input  double            Lots           = 0.5;
 
 input  int               ATR_Period     = 14;           //ATR Period for Dynamic SL and TP
 input  double            ATR_SLFactor   = 1.0;
+input  double            ATR_TPFactor   = 1.0;
 input  ENUM_TIMEFRAMES   ATR_TimeFrame  = PERIOD_CURRENT;
 
 input  ENUM_TIMEFRAMES   Ichi_Period    = PERIOD_CURRENT; 
@@ -85,16 +86,20 @@ void OnTick()
    CopyBuffer(ATR_Handle,MAIN_LINE,1,1,ATR_Buffer);
    
    double ask = SymbolInfoDouble(_Symbol,SYMBOL_ASK);
-   double ask = SymbolInfoDouble(_Symbol,SYMBOL_BID);
+   double bid = SymbolInfoDouble(_Symbol,SYMBOL_BID);
    
    if(tenkanSen[1]>kijunSen[1] && tenkanSen[0]<=kijunSen[0])
      {
-      //BuyFunction
+      double sl = ask - ATR_Buffer[0]*ATR_SLFactor;
+      double tp = ask + ATR_Buffer[0]*ATR_TPFactor;
+      trade.Buy(Lots,_Symbol,ask,sl,tp,TradeComment);
      }
    else
      if(tenkanSen[1]<kijunSen[1] && tenkanSen[0]>=kijunSen[0])
        {
-        //SellFunction
+        double sl = bid + ATR_Buffer[0]*ATR_SLFactor;
+        double tp = bid - ATR_Buffer[0]*ATR_TPFactor;
+        trade.Sell(Lots,_Symbol,ask,sl,tp,TradeComment);
        }
   }
 
