@@ -8,8 +8,6 @@
 #property version   "1.00"
 
 #include <Trade/Trade.mqh>
-#include <Trade/SymbolInfo.mqh>
-#include <Trade/PositionInfo.mqh>
 
 input group "=== Trading Inputs ==="
 
