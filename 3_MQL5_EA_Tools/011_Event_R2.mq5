@@ -27,3 +27,32 @@ int OnInit()
 
    return(INIT_SUCCEEDED);
   }
+
+  bool isNewTime() const
+  {
+     return lastRead != lastTime();
+  }
+  
+  bool getOuterIndices(int &min, int &max)
+  {
+     if(isNewTime())
+     {
+        if(!read()) return false;
+     }
+     max = ArrayMaximum(data);
+     min = ArrayMinimum(data);
+     return true;
+  }
+  
+  double operator[](const int buffer)
+  {
+     if(isNewTime())
+     {
+        if(!read())
+        {
+           return EMPTY_VALUE;
+        }
+     }
+     return data[buffer];
+  }
+};
