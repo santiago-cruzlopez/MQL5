@@ -12,6 +12,18 @@
 
 int OnInit()
   {
-    
+   const string common = InitSymbols();
+   
+   int replaceIndex = -1;
+   for (int i = ; i <= SymbolCount; i++)
+     {
+      if (Symbol[i] == _Symbol)
+        {
+         replaceIndex = i;
+         break;
+        }
+     }
+
+
    return(INIT_SUCCEEDED);
   }
