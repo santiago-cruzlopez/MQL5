@@ -11,22 +11,18 @@
 #include <Trade/Trade.mqh>
 
 int OnInit()
-  {
-   const string common = InitSymbols();
+{
+   currenciesCount = 0;
+   ArrayResize(currencies, 0);
    
-   int replaceIndex = -1;
-   for (int i = ; i <= SymbolCount; i++)
-     {
-      if (Symbol[i] == _Symbol)
-        {
-         replaceIndex = i;
-         break;
-        }
-     }
-
-
-   return(INIT_SUCCEEDED);
-  }
+   if(!StartUp(true)) return INIT_PARAMETERS_INCORRECT;
+   
+   const bool barwise = UnityPriceType == PRICE_CLOSE && UnityPricePeriod == 1;
+   controller = new UnityController(UnitySymbols, barwise,
+      UnityBarLimit, UnityPriceType, UnityPriceMethod, UnityPricePeriod);
+   // waiting for messages from the indicator on currencies in buffers
+   return INIT_SUCCEEDED;
+}
 
   bool isNewTime() const
   {
@@ -56,3 +52,4 @@ int OnInit()
      return data[buffer];
   }
 };
+
