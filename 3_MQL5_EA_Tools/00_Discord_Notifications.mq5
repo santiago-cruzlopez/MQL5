@@ -1,6 +1,6 @@
 ﻿//+------------------------------------------------------------------+
 //|                                      1.Discord_Notifications.mq5 |
-//|                                      Santiago Cruz, AlgoNet Inc. |
+//|                                            Author: Santiago Cruz |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
 
@@ -8,7 +8,7 @@
 
 //Source Link: https://www.mql5.com/en/articles/16682?utm_source=mql5.com.tg&utm_medium=message&utm_campaign=articles.codes.repost
 
-#property copyright "Santiago Cruz, AlgoNet Inc."
+#property copyright "Santiago Cruz"
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 

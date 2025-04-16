@@ -1,10 +1,9 @@
 //+------------------------------------------------------------------+
 //|                                                 011_Event_R2.mq5 |
-//|                                      Santiago Cruz, AlgoNet Inc. |
+//|                                            Author: Santiago Cruz |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
-
-#property copyright "Santiago Cruz, AlgoNet Inc."
+#property copyright "Santiago Cruz"
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 

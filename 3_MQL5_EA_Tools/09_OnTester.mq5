@@ -1,5 +1,5 @@
-#property copyright "Your Name"
-#property link      "https://www.example.com"
+#property copyright "Santiago Cruz"
+#property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 
 // Input parameters for optimization

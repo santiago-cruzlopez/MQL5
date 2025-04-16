@@ -1,12 +1,12 @@
 //+------------------------------------------------------------------+
-//|                                        6.Trailing_Stop_02.mq5    |
-//|                                      Santiago Cruz, AlgoNet Inc. |
+//|                                           6.Trailing_Stop_02.mq5 |
+//|                                            Author: Santiago Cruz | 
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
 
 //Source: "https://github.com/nkanven/MT4-MT5-Trading-EA-Collections/blob/master/MQL5/Experts/Nkanven/TrendlinesEA.mq5"
 
-#property copyright "Santiago Cruz, AlgoNet Inc."
+#property copyright "Santiago Cruz"
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 

@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                             Second Indicator.mq5 |
-//|                                      Santiago Cruz, AlgoNet Inc. |
+//|                                            Author: Santiago Cruz |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
 #property copyright "Santiago Cruz, AlgoNet Inc."

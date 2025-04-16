@@ -1,4 +1,4 @@
-#property copyright "Santiago Cruz, AlgoNet Inc."
+#property copyright "Santiago Cruz"
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 #property strict

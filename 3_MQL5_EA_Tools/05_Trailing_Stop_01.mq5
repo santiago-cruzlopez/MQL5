@@ -1,10 +1,10 @@
 //+------------------------------------------------------------------+
 //|                                           5.Trailing_Stop_01.mq5 |
-//|                                      Santiago Cruz, AlgoNet Inc. |
+//|                                            Author: Santiago Cruz |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
 //Source: https://www.youtube.com/watch?v=3l8RyeQNmNo&t=1290s
-#property copyright "Santiago Cruz, AlgoNet Inc."
+#property copyright "Santiago Cruz"
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 #include <Trade/Trade.mqh>
