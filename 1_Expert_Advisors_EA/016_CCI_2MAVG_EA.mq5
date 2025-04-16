@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                              16.CCI_2MAVG_EA.mq5 |
-//|                                      Santiago Cruz, AlgoNet Inc. |
+//|                                            Author: Santiago Cruz |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
 
@@ -17,7 +17,7 @@
    - Trade Exit when MAVG crosses above Slow MAVG
 */
 
-#property copyright "Santiago Cruz, AlgoNet Inc."
+#property copyright "Santiago Cruz"
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 
