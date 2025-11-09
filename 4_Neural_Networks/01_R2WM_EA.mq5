@@ -1,6 +1,6 @@
 //+------------------------------------------------------------------+
 //|                                                   01_R2WM_EA.mq5 |
-//|                                      Santiago Cruz, AlgoNet Inc. |
+//|                                                    Santiago Cruz |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
 
@@ -37,8 +37,8 @@ int OnInit()
   { 
    return(INIT_SUCCEEDED);
   }
-
-void OnDeinit(const int reason)
+  
+  void OnDeinit(const int reason)
   {
    
   }
