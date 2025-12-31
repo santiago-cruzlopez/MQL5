@@ -4,7 +4,7 @@
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
 
-#property copyright "Santiago Cruz"
+#property copyright "Santiago Cruz, AlgoNet Inc."
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 #property version   "1.00"
 
@@ -37,8 +37,8 @@ int OnInit()
   { 
    return(INIT_SUCCEEDED);
   }
-  
-  void OnDeinit(const int reason)
+
+void OnDeinit(const int reason)
   {
    
   }

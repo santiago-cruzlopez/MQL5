@@ -9,250 +9,308 @@
 
 #include <Math\Stat\Normal.mqh>
 
-//--- WNN (Wavelet Neural Network)
-
-class WNN
+class NeuralNetwork
   {
-   protected:
-      
-      int m_deep;
-      int m_deepth;
-      string m_Symbol;
-      double close[];
-      matrix m_input;
-      matrix m_pred_input;
-      ENUM_TIMEFRAMES m_TF;
-      matrix m_z_2;
-      matrix m_a_2;
-      matrix m_z_3;
-      matrix m_yHat;
-      double y_cor;
-      double m_alpha;      
-      
-   public:
-   
-   matrix W_1;
-   matrix W_2;
-   matrix W_1_LSTM;
+private:
+   int               m_maxiters;
+   double            m_beta_1;
+   double            m_beta_2;
+   bool              m_verbose;
+   double            m_LearningRate;
+   int               m_deep;
+   int               m_depth;
+   matrix            m_input;
+   matrix            m_pred_input;
+   matrix            m_z_2;
+   matrix            m_a_2;
+   matrix            m_z_3;
+   matrix            m_yHat;
+   matrix            z_3_prime;
+   matrix            z_2_prime;
+   matrix            delta2;
+   matrix            delta3;
+   matrix            dJdW1;
+   matrix            dJdW2;
+   matrix            y_cor;
+   double            m_alpha;
+   int               m_outDim;
+   matrix            Forward_Prop(matrix &Input);
+   double            Cost(matrix &Input, matrix &y_cor);
+   double            Sigmoid(double x);
+   double            Sigmoid_Prime(double x);
+   void              MatrixRandom(matrix &m);
+   matrix            MatrixSigmoidPrime(matrix &m);
+   matrix            MatrixSigmoid(matrix &m);
+   void              ComputeDerivatives(matrix &Input, matrix &y_);
 
-//--- WNN Constructor
-//--- The constructor WNN initializes the neural network with parameters like the symbol, 
-//--- timeframe, history depth, number of neurons, and learning rate (alpha).   
-   WNN(string Symbol_, ENUM_TIMEFRAMES TimeFrame, int History_Depth, int Number_of_Neurons, double alpha);
+public:
 
-//--- These functions implement the sigmoid activation function and its derivative, respectively.   
-   double Sigmoid(double x);
-   double Sigmoid_Prime(double x);
+   matrix            W_1;
+   matrix            W_2;
 
-//--- This function returns the sign of a value, either +1 or -1.   
-   int    Sgn( double Value);
+                     NeuralNetwork(int in_DimensionRow,int in_DimensionCol,int Number_of_Neurons,int out_Dimension,double alpha,double LearningRate,bool Verbose,double beta_1, double beta_2,int max_iterations);
+   void              Train(matrix& Input,matrix &correct_Val);
+   int               Sgn(double Value);
+   matrix            Prediction(matrix& Input);
+   void              ResetWeights();
+   bool              WriteWeights();
+   bool              LoadWeights();
 
-//--- This function initializes a matrix with random values drawn from a normal distribution.   
-   void   MatrixRandom(matrix& m);
-   
-//--- These functions apply the sigmoid function and its derivative to each element of a matrix, respectively.   
-   matrix MatrixSigmoid(matrix& m);
-   matrix MatrixSigmoidPrime(matrix& m);
-   matrix Forward_Prop();
-   double Cost();
-   void   UpdateValues(int shift);
-   void   Train(int shift);
-   double Prediction();   
+   // A_nxm X B_mxa = X_nxa
   };
 
-WNN::WNN(string Symbol_,ENUM_TIMEFRAMES TimeFrame,int History_Depth,int Number_of_Neurons,double alpha)
+bool NeuralNetwork::LoadWeights(void)
   {
-   m_Symbol = Symbol_;
-   m_deepth = History_Depth;
-   m_deep   = Number_of_Neurons;
-   m_TF     = TimeFrame;
-   m_alpha  = alpha; 
-   
-   matrix random_LSTM(1,m_deep);
-   matrix random_W1(m_deepth,m_deep);
-   matrix random_W2(m_deep,1);
-    
+
+   int handle = FileOpen("Weights_1.txt",FILE_READ,",",FILE_TXT);
+
+   return true;
+
+  }
+
+bool NeuralNetwork::WriteWeights(void)
+  {
+
+   string InpName = "Weights_1.txt";
+
+   int handle_w1=FileOpen(InpName,FILE_READ|FILE_WRITE|FILE_CSV);
+
+   InpName = "Weights_2.txt";
+
+   int handle_w2=FileOpen(InpName,FILE_READ|FILE_WRITE|FILE_TXT);
+
+   FileWrite(handle_w2,W_2);
+   FileClose(handle_w2);
+
+
+   return true;
+  };
+
+void NeuralNetwork::ResetWeights(void)
+  {
+
+   matrix random_W1(m_depth, m_deep);
+   matrix random_W2(m_deep, m_outDim);
+
    MatrixRandom(random_W1);
    MatrixRandom(random_W2);
-   MatrixRandom(random_LSTM);
-    
-   W_1 = random_W1;
-   W_2 = random_W2;
-   W_1_LSTM = random_LSTM; 
-    
-   ArrayResize(close,m_deepth+5,0);
-       
-   m_yHat.Init(1,1);
-   m_yHat[0][0] = 0;
-   y_cor = -1;
-   
+
+   W_1      =   random_W1;
+   W_2      = random_W2;
   }
 
-double WNN::Prediction(void)
+void NeuralNetwork::ComputeDerivatives(matrix &Input, matrix &y_)
   {
-   matrix pred_z_2 = m_pred_input.MatMul(W_1) + W_1_LSTM;
-   
+
+   matrix X = Input;
+   matrix Y = y_;
+
+   m_yHat = Forward_Prop(X);
+
+//Print( m_yHat.Cols(),m_yHat.Rows() );
+
+
+   matrix cost =-1*(Y-m_yHat);
+
+   z_3_prime = MatrixSigmoidPrime(m_z_3);
+
+   delta3 = cost*(z_3_prime);
+
+   dJdW2 = m_a_2.Transpose().MatMul(delta3);
+
+
+   z_2_prime = MatrixSigmoidPrime(m_z_2);
+   delta2 = delta3.MatMul(W_2.Transpose())*z_2_prime;
+
+
+   dJdW1 = m_input.Transpose().MatMul(delta2);
+
+  };
+
+NeuralNetwork::NeuralNetwork(int in_DimensionRow,int in_DimensionCol,int Number_of_Neurons,int out_Dimension,double alpha,double LearningRate,bool Verbose, double beta_1, double beta_2,int max_iterations)
+  {
+
+   m_depth = in_DimensionCol;
+   m_deep  = Number_of_Neurons;
+   m_alpha = alpha;
+   m_outDim= out_Dimension;
+   m_LearningRate = LearningRate;
+   m_beta_1 = beta_1;
+   m_beta_2 = beta_2;
+   matrix random_W1(m_depth, m_deep);
+   matrix random_W2(m_deep, out_Dimension);
+
+   m_verbose = Verbose;
+   m_maxiters =max_iterations;
+   MatrixRandom(random_W1);
+   MatrixRandom(random_W2);
+
+   W_1      =   random_W1;
+   W_2      = random_W2;
+
+   Print(W_1);
+   Print(W_2);
+
+  }
+
+matrix NeuralNetwork::Prediction(matrix& Input)
+  {
+
+   m_pred_input = Input;
+
+   matrix pred_z_2 = m_pred_input.MatMul(W_1) ;  ;
+
+
    matrix pred_a_2 = MatrixSigmoid(pred_z_2);
-   
+
    matrix pred_z_3 = pred_a_2.MatMul(W_2);
-   
+
    matrix pred_yHat = MatrixSigmoid(pred_z_3);
-   
-   return m_yHat[0][0];
+
+
+   return pred_yHat;
   }
 
-void WNN::Train(int shift)
+void NeuralNetwork::Train(matrix &Input,matrix &correct_Val)
   {
+
    bool Train_condition = true;
-   UpdateValues(shift);  
-   while(Train_condition)
+   y_cor = correct_Val;
+   int iterations = 0 ;
+
+   m_yHat= Forward_Prop(Input);
+   ComputeDerivatives(Input,y_cor);
+
+   matrix mt_1(W_1.Rows(),W_1.Cols());
+   mt_1.Fill(0);
+
+
+   matrix mt_2(W_2.Rows(),W_2.Cols());
+   mt_2.Fill(0);
+
+   double J = 0;
+   
+   while(Train_condition && iterations <m_maxiters)
      {
-      m_yHat = Forward_Prop();
-      double J = Cost();
-      
+
+      m_yHat= Forward_Prop(Input);
+      ComputeDerivatives(Input,y_cor);
+      J = Cost(Input,y_cor);
+
       if(J < m_alpha)
         {
          Train_condition = false;
         }
-        
-      matrix X_m_matrix = {{y_cor}};
-      
-      matrix cost = -1*(X_m_matrix - m_yHat);
-      
-      matrix z_3_prime = MatrixSigmoidPrime(m_z_3);
-      
-      matrix delta3 = cost.MatMul(z_3_prime);
-      
-      matrix dJdW2  = m_a_2.Transpose().MatMul(delta3);
-      
-      matrix z_2_prime = MatrixSigmoidPrime(m_z_2);
-      
-      matrix delta2 = delta3.MatMul(W_2.Transpose())*z_2_prime;
-      
-      matrix dJdW1 = m_input.Transpose().MatMul(delta2);
-      
-      W_1 = W_1 - dJdW1;
-      W_2 = W_2 - dJdW2;
-     }
-   
-   W_1_LSTM = m_input.MatMul(W_1);
-   
-  }
 
-void WNN::UpdateValues(int shift)
-  {
-   for(int i=0 ; i<m_deepth+5 ; i++)
+      double beta_1 = m_beta_1;
+      double beta_2 = m_beta_2;
+      mt_1 = beta_1*mt_1 +(1-beta_1)*(dJdW1);
+      mt_2 = beta_1*mt_2 +(1-beta_1)*(dJdW2);
+
+      W_1 = W_1 - m_LearningRate*(beta_2*mt_1);
+      W_2 = W_2 - m_LearningRate*(beta_2*mt_2);
+
+      iterations++;
+     }
+
+   if(m_verbose == true)
      {
-      close[i] = iClose(m_Symbol,m_TF,i+shift);
+      Print(iterations,"<<<< iterations");
+      Print(J,"<<<< cost_value");
      }
-    
-    m_input.Init(1,m_deepth);
-    
-    for(int i=0+1 ; i<m_deepth+1 ; i++)
-      {
-       m_input[0][i-1] = close[i];
-      }
-
-    m_pred_input.Init(1,m_deepth);
-    
-    for(int i=0 ; i<m_deepth ; i++)
-      {
-       m_input[0][i] = close[i];
-      }
-      
-    y_cor = (Sgn(close[0]-close[1]) + 1)/2;            
   }
 
-double WNN::Cost(void)
+double NeuralNetwork::Cost(matrix &Input, matrix &y_)
   {
-   double J = .5*pow(y_cor - m_yHat[0][0],2);
+   matrix X = Input;
+   matrix Y = y_;
+   m_yHat = Forward_Prop(X);
+
+   matrix temp = (Y -m_yHat);
+   temp = temp*temp;  /// temp^2
+   double J = .5*(temp.Sum()/(temp.Cols()*temp.Rows()));
    
-   return J;    
+   return J;
   }
 
-matrix WNN::Forward_Prop(void)
+matrix NeuralNetwork::Forward_Prop(matrix& Input)
   {
-   m_z_2 = m_input.MatMul(W_1) + W_1_LSTM;
-   
+   m_input = Input;
+
+   m_z_2 = m_input.MatMul(W_1);   ;
+
    m_a_2 = MatrixSigmoid(m_z_2);
-   
+
    m_z_3 = m_a_2.MatMul(W_2);
-   
-   m_yHat = MatrixSigmoid(m_z_3);
-   
-   return m_yHat; 
+
+   matrix yHat = MatrixSigmoid(m_z_3);
+
+   return yHat;
   }
 
-//--- Sigmoid Function: σ(x)= 1 / 1 + e^(-x)​
-//--- This function maps any input value to a range between 0 and 1, 
-//--- which is useful for binary classification and as an activation function in neural networks.  
-double WNN::Sigmoid(double x)
+double NeuralNetwork::Sigmoid(double x)
   {
-   return 1/(1+MathExp(-x));
+   return(1/(1+MathExp(-x)));
   }
 
-//--- Sigmoid Derivative Function: σ′(x)=σ(x)⋅(1−σ(x))
-//--- This derivative is used during backpropagation to compute gradients.
-double WNN::Sigmoid_Prime(double x)
+double NeuralNetwork::Sigmoid_Prime(double x)
   {
-   return MathExp(-x)/(pow(1+MathExp(-x),2));
+   return(MathExp(-x)/(pow(1+MathExp(-x),2)));
   }
 
-
-int WNN::Sgn(double Value)
+int NeuralNetwork::Sgn(double Value)
   {
-   int RES;
-   
-   if(Value > 0)
+   int res;
+
+   if(Value>0)
      {
-      RES = 1;
+      res = 1;
+
      }
    else
      {
-      RES = -1;
+      res = -1;
      }
-   return RES;
+   return res;
   }
 
-//--- This function initializes each element of the matrix m with random values drawn 
-//--- from a normal distribution with mean 0 and standard deviation 1. 
-void WNN::MatrixRandom(matrix &m)
+void NeuralNetwork::MatrixRandom(matrix& m)
   {
    int error;
-   
    for(ulong r=0; r<m.Rows(); r++)
      {
-      for(ulong c=0 ; c<m.Cols(); c++)
+      for(ulong c=0; c<m.Cols(); c++)
         {
-         m[r][c] = MathRandomNormal(0,1,error);
+
+         m[r][c]= MathRandomNormal(0,1,error);
         }
      }
-  }
- 
-matrix WNN::MatrixSigmoid(matrix &m)
-  {
-   matrix m_2;
-   m_2.Init(m.Rows(),m.Cols());   
-   for(ulong r=0; r<m.Rows(); r++)
-     {
-      for(ulong c=0 ; c<m.Cols(); c++)
-        {
-         m_2[r][c] = Sigmoid(m[r][c]);
-        }
-     }
-   return m_2;
   }
 
-matrix WNN::MatrixSigmoidPrime(matrix &m)
- {
+matrix NeuralNetwork::MatrixSigmoid(matrix& m)
+  {
    matrix m_2;
    m_2.Init(m.Rows(),m.Cols());
    for(ulong r=0; r<m.Rows(); r++)
      {
-      for(ulong c=0 ; c<m.Cols(); c++)
+      for(ulong c=0; c<m.Cols(); c++)
         {
-         m_2[r][c] = Sigmoid_Prime(m[r][c]);
+         m_2[r][c]=Sigmoid(m[r][c]);
         }
      }
    return m_2;
- }
+  }
+
+matrix NeuralNetwork::MatrixSigmoidPrime(matrix& m)
+  {
+   matrix m_2;
+   m_2.Init(m.Rows(),m.Cols());
+   for(ulong r=0; r<m.Rows(); r++)
+     {
+      for(ulong c=0; c<m.Cols(); c++)
+        {
+         m_2[r][c]= Sigmoid_Prime(m[r][c]);
+        }
+     }
+   return m_2;
+  }
