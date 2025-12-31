@@ -11,30 +11,48 @@
 #include <Trade\PositionInfo.mqh>
 #include <Trade\AccountInfo.mqh>
 #include <Trade\Trade.mqh>
-#include <WNN.mqh>
+#include <NeuralNetwork.mqh>
+#include <OrderBook.mqh>
 
 CTrade trade;
 CAccountInfo  AccInfo;
 CPositionInfo m_position;
+OrderBook OB_ASK;
+OrderBook OB_Bid;
 
 input group "=== Trading Inputs ==="
 
 input string          TradeComment      = "WNN Neural Network EA";
-static input long     EA_Magic_Buy      = 250201;  
-static input long     EA_Magic_Sell     = 250202;
+static input long     EA_Magic_Buy      = 250206;  
+static input long     EA_Magic_Sell     = 250207;
 input double          LotSize           = 1.05;
 double                pip               = _Point*10;
 input int             TPinPips          = 5;
-input int             SLinPips          = 5;
+input int             SLinPips          = 5;    
 input ENUM_TIMEFRAMES TimeFrame         = PERIOD_H1;
-input int             min               = 50;
 input int             number_of_neurons = 15;
-input int             history_depth     = 15;     
+input int             SlowMA            = 100;
+input int             FastMA            = 20;
+input int             RSIPeriod         = 14; 
 
-WNN WNN_2(_Symbol,TimeFrame,history_depth,number_of_neurons,.00000001);
+NeuralNetwork NNTrade_Buy(10,28,number_of_neurons,10,.0001,1);
+NeuralNetwork NNTrade_Sell(10,28,number_of_neurons,10,.0001,1);
+
+matrix tempMatrix(10,28);
+matrix tempMatrixb(10,28);
+
+bool Tracker = true;
+ulong TimeCheck = ulong(TimeCurrent());
+double tempAsk = SymbolInfoDouble(_Symbol,SYMBOL_ASK);
+
+int deltaTick = 0;
+bool deltaTracker = false;
+double delta_prev = 0;
+double deltaDerivative = 0;
 
 int OnInit()
   { 
+  
    return(INIT_SUCCEEDED);
   }
 
@@ -49,80 +67,63 @@ void OnTick()
    MqlDateTime stm;
    TimeToStruct(tm,stm);
    
-   int TimeCheck = 0;
-   
-   if(stm.day_of_week==2 || stm.day_of_week==3 || stm.day_of_week==4 && stm.hour>7 && stm.hour<15)
+   if( (stm.hour == 16 && stm.min >=0) || (stm.hour == 17 && stm.min <= 40) )
      {
-      TimeCheck = 1;
-     }
    
-   if(m_position.SelectByMagic(_Symbol,EA_Magic_Buy))
+   for(int i=PositionGetTicket()-1;i>=0;i--)
      {
-      if((long)m_position.Time() + 60*min < (long)TimeCurrent())
-        {
-         trade.PositionClose(m_position.Ticket(),-1);
-        }
-     }
-     
-   if(m_position.SelectByMagic(_Symbol,EA_Magic_Sell))
-     {
-      if((long)m_position.Time() + 60*min < (long)TimeCurrent())
-        {
-         trade.PositionClose(m_position.Ticket(),-1);
-        }
-     }
-   
-   bool TradeTracker = (m_position.SelectByMagic(_Symbol,EA_Magic_Buy) == false) && (m_position.SelectByMagic(_Symbol, EA_Magic_Sell) == false);
-   
-   if(stm.min == 1)
-     {
-      WNN_2.Train(0);
+      int ticket = PositionGetTicket(i);
+      m_position.SelectByTicket(ticket);
+      ulong posTime = ulong(m_position.Time());
       
-      double Pred = WNN_2.Prediction();
-      Print(Pred);
-      
-      if(Pred<.5 && TradeTracker && TimeCheck==1)
+      if(1*60 < ulong(TimeCurrent()) - posTime)
         {
-         double TakeProfit = pip*TPinPips;
-         double StopLoss = pip*SLinPips;
-         
-         MqlTradeRequest myrequest;
-         MqlTradeResult myresult;
-         ZeroMemory(myrequest);
-         ZeroMemory(myresult);
-         
-         myrequest.type = ORDER_TYPE_BUY;
-         myrequest.action = TRADE_ACTION_DEAL;
-         myrequest.sl = SymbolInfoDouble(_Symbol,SYMBOL_BID) - StopLoss;
-         myrequest.symbol = _Symbol;
-         myrequest.volume = LotSize;
-         myrequest.type_filling = ORDER_FILLING_FOK;
-         myrequest.price = SymbolInfoDouble(_Symbol,SYMBOL_ASK);
-         myrequest.magic = EA_Magic_Buy;
-         OrderSend(myrequest,myresult);
+         int ticket = PositionGetTicket(i);
+         trade.PositionClose(ticket);
         }
-
-      if(Pred>.5 && TradeTracker && TimeCheck==1)
-        {
-         double TakeProfit = pip*TPinPips;
-         double StopLoss = pip*SLinPips;
-         
-         MqlTradeRequest myrequest;
-         MqlTradeResult myresult;
-         ZeroMemory(myrequest);
-         ZeroMemory(myresult);
-         
-         myrequest.type = ORDER_TYPE_SELL;
-         myrequest.action = TRADE_ACTION_DEAL;
-         myrequest.sl = SymbolInfoDouble(_Symbol,SYMBOL_BID) + StopLoss;
-         myrequest.symbol = _Symbol;
-         myrequest.volume = LotSize;
-         myrequest.type_filling = ORDER_FILLING_FOK;
-         myrequest.price = SymbolInfoDouble(_Symbol,SYMBOL_BID);
-         myrequest.magic = EA_Magic_Sell;
-         OrderSend(myrequest,myresult);
-        }
-  
      }
+   
+   double current_Ask = SymbolInfoDouble(_Symbol,SYMBOL_ASK);
+   double current_Bid = SymbolInfoDouble(_Symbol,SYMBOL_BID);
+   
+   ulong current_Volume = iTickVolume(_Symbol,PERIOD_M1,0);
+   
+   OB_Ask.Insert(current_Ask,current_Volume);
+   OB_Bid.Insert(current_Bid,current_Volume);
+   
+   double UniqueAsk[];
+   double UniqueNumsAsk[];
+   
+   double UniqueBid[];
+   double UniqueNumsBid[];
+   
+   double UniqueAskSize = OB_Ask.SetArraysWithValues(UniqueNumsAsk,UniqueAsk);
+   double UniqueBidSize = OB_Bid.SetArraysWithValues(UniqueNumsBid,UniqueBid);
+   
+   double deltaAsk = 0;
+   double deltaBid = 0;
+   double delta = 0;
+   
+   if(stm.sec < deltaTick)
+     {
+      for(int i=0;i<UniqueAskSize;i++)
+        {
+         deltaAsk += UniqueNumsAsk[i]*UniqueAsk[i];
+        }
+        
+      for(int i=0;i<UniqueBidSize;i++)
+        {
+         deltaBid += UniqueNumsBid[i]*UniqueBid[i];
+        }
+      
+      delta = deltaAsk - deltaBid;
+      deltaDerivative = (current_Ask - delta) / current_Ask - delta_prev;
+      delta_prev = (current_Ask - delta)/current_Ask;
+      
+      OB_Ask.ClearBook();
+      OB_Bid.ClearBook();
+     }
+   
+   deltaTick = stm.sec;
    
   }

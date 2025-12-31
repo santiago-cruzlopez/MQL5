@@ -1,9 +1,10 @@
 
 //+------------------------------------------------------------------+
-//|                                                          WNN.mqh |
+//|                                            NeuralNetwork.mqh.mqh |
 //|                                      Santiago Cruz, AlgoNet Inc. |
 //|                       https://www.mql5.com/en/users/algo-trader/ |
 //+------------------------------------------------------------------+
+
 #property copyright "Santiago Cruz, AlgoNet Inc."
 #property link      "https://www.mql5.com/en/users/algo-trader/"
 
